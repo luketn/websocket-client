@@ -2,7 +2,8 @@ const WebSocket = require('ws');
 const faker = require('faker');
 const count = 400;
 const websockets = [];
-let countMessages;
+let countMessages = 0;
+let countConnections = 0;
 
 function oneHundredWebSockets() {
     for (let i = 0; i < 100; i++) {
@@ -12,6 +13,7 @@ function oneHundredWebSockets() {
         let ws = new WebSocket('wss://stingray-test-app.superservice.com/websockets-sydney');
         ws.on('open', function open() {
             ws.send(JSON.stringify({message: 'identify', username: `${firstName} ${lastName}`}));
+            countConnections++;
         });
         ws.on('message', function incoming(data) {
             let messageData = JSON.parse(data);
@@ -26,18 +28,17 @@ function oneHundredWebSockets() {
     }
 }
 
-countMessages = 0;
+let nextBatch = countConnections + 100;
 oneHundredWebSockets();
 let interval = setInterval(()=>{
-    if (countMessages === 100) {
-        countMessages = 0;
+    if (countConnections >= nextBatch) {
+        nextBatch = countConnections + 100;
         oneHundredWebSockets();
     }
-    console.log(`Established ${websockets.length} web sockets. Waiting for ${countMessages}/100 new connections to be established and identified.`);
+    console.log(`Established ${countConnections} web sockets. Waiting for ${countConnections}/${nextBatch} new connections to be established (identified ${countMessages}/${countConnections}).`);
 
-
-    if (websockets.length >= count) {
+    if (countMessages >= count) {
+        console.log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${countConnections}).`);
         clearInterval(interval);
     }
-}, 1000);
-
+}, 500);
