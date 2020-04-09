@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 const faker = require('faker');
-const count = 400;
+const count = 200000;
 const websockets = [];
 let countMessages = 0;
 let countConnections = 0;
@@ -41,4 +41,4 @@ let interval = setInterval(()=>{
         console.log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${countConnections}).`);
         clearInterval(interval);
     }
-}, 500);
+}, 300);
