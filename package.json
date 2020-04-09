@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js"
+    "many": "node index.js",
+    "simple": "node simple.js"
   },
   "author": "",
   "license": "ISC",
