@@ -41,4 +41,4 @@ let interval = setInterval(()=>{
         console.log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${countConnections}).`);
         clearInterval(interval);
     }
-}, 300);
+}, 500);
