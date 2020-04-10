@@ -25,11 +25,11 @@ function oneHundredWebSockets() {
             }
         });
         ws.on('error', (error)=>{
-            console.log(`Error occurred for socket ${firstName} ${lastName}:\n${error}`);
+            console_log(`Error occurred for socket ${firstName} ${lastName}:\n${error}`);
             countConnections++;
         });
         ws.on('close', () => {
-            console.log(`Closed for ${firstName} ${lastName}.`);
+            console_log(`Closed for ${firstName} ${lastName}.`);
         });
         websockets.push(ws);
     }
@@ -38,15 +38,15 @@ function oneHundredWebSockets() {
 let nextBatch = countConnections + 100;
 oneHundredWebSockets();
 let interval = setInterval(()=>{
-    if (countConnections >= nextBatch) {
-        nextBatch = countConnections + 100;
-        oneHundredWebSockets();
-    }
-    console.log(`Established ${countConnections}/${COUNT} web sockets. Waiting for next batch of 100 new connections to be established (identified ${countMessages}/${COUNT}).`);
-
     if (countMessages >= COUNT) {
-        console.log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${COUNT}).`);
+        console_log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${COUNT}).`);
         clearInterval(interval);
+    } else {
+        if (websockets.length < COUNT && countConnections >= nextBatch) {
+            nextBatch = countConnections + 100;
+            oneHundredWebSockets();
+        }
+        console_log(`Established ${countConnections}/${COUNT} web sockets. Waiting for next batch of 100 new connections to be established (identified ${countMessages}/${COUNT}).`);
     }
 }, 500);
 
@@ -61,11 +61,14 @@ let keep_alive_interval = setInterval(()=>{
             countClosed++;
         }
     }
-    console.log(`Pinged ${countPinged}/${COUNT} web sockets.`);
+    console_log(`Pinged ${countPinged}/${COUNT} web sockets.`);
 
     if (countClosed===COUNT){
-        console.log('All connections closed.');
+        console_log('All connections closed.');
         clearInterval(keep_alive_interval);
     }
 }, 5 * 60 * 1000); //five minutes
 
+const console_log = message=>{
+    console.log(`${new Date().toISOString()}: ${message}`);
+};
