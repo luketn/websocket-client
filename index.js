@@ -7,6 +7,7 @@ const websockets = [];
 
 let countMessages = 0;
 let countConnections = 0;
+let countErrors = 0;
 
 function oneHundredWebSockets() {
     for (let i = 0; i < 100; i++) {
@@ -24,9 +25,9 @@ function oneHundredWebSockets() {
                 countMessages++;
             }
         });
-        ws.on('error', (error)=>{
+        ws.on('error', (error) => {
             console_log(`Error occurred for socket ${firstName} ${lastName}:\n${error}`);
-            countConnections++;
+            countErrors++;
         });
         ws.on('close', () => {
             console_log(`Closed for ${firstName} ${lastName}.`);
@@ -37,12 +38,12 @@ function oneHundredWebSockets() {
 
 let nextBatch = countConnections + 100;
 oneHundredWebSockets();
-let interval = setInterval(()=>{
-    if (countMessages >= COUNT) {
-        console_log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${COUNT}).`);
+let interval = setInterval(() => {
+    if ((countConnections + countErrors) >= COUNT) {
+        console_log(`Finished! Established ${countConnections} web sockets (identified ${countMessages}/${COUNT}) (${countErrors} errors).`);
         clearInterval(interval);
     } else {
-        if (websockets.length < COUNT && countConnections >= nextBatch) {
+        if (websockets.length < COUNT && (countConnections+countErrors) >= nextBatch) {
             nextBatch = countConnections + 100;
             oneHundredWebSockets();
         }
@@ -50,7 +51,7 @@ let interval = setInterval(()=>{
     }
 }, 500);
 
-let keep_alive_interval = setInterval(()=>{
+let keep_alive_interval = setInterval(() => {
     let countPinged = 0;
     let countClosed = 0;
     for (const websocket of websockets) {
@@ -63,12 +64,12 @@ let keep_alive_interval = setInterval(()=>{
     }
     console_log(`Pinged ${countPinged}/${COUNT} web sockets.`);
 
-    if (countClosed===COUNT){
+    if (countClosed === COUNT) {
         console_log('All connections closed.');
         clearInterval(keep_alive_interval);
     }
 }, 5 * 60 * 1000); //five minutes
 
-const console_log = message=>{
+const console_log = message => {
     console.log(`${new Date().toISOString()}: ${message}`);
 };
